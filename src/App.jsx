@@ -308,13 +308,17 @@ export default function App() {
   const latest = all[all.length - 1];
   const first = all[0];
   const tvl = latest.sr + latest.jr;
-  const ratio = liveEps.length > 0 ? 70.0 : (latest.sr / tvl * 100); // Forward: 70/30 enforced
-  const srTot = latest.srSP ? (latest.srSP - 100) : ((latest.sr - first.sr) / first.sr * 100);
-  const jrTot = latest.jrSP ? (latest.jrSP - 100) : ((latest.jr - first.jr) / first.jr * 100);
+  const ratio = 70.0; // Always 70/30 — vault deposit gates enforce this
 
-  // Junior max DD
-  let jrPk = first.jr, jrDD = 0;
-  all.forEach(s => { if (s.jr > jrPk) jrPk = s.jr; const d = (s.jr - jrPk) / jrPk * 100; if (d < jrDD) jrDD = d; });
+  // Forward junior APY at current leverage (what depositors actually get)
+  const lev = latest.lev;
+  const poolApy = lev * P.SUSDAT - (lev - 1) * P.BORROW;
+  const srClaim = P.SR_GROSS * 0.70;
+  const jrGrossApy = (poolApy - srClaim) / 0.30;
+  const jrNetApy = jrGrossApy > 0 ? jrGrossApy * (1 - P.JR_PERF) - P.JR_MGMT : jrGrossApy - P.JR_MGMT;
+  
+  // Health factor from leverage
+  const hf = lev > 1 ? (lev * 0.825) / (lev - 1) : Infinity;
 
   // Chart data — use share prices for forward, NAV-based for backtest
   const cd = all.map(s => ({
@@ -394,15 +398,13 @@ export default function App() {
 
         <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 20px 40px"}}>
           {/* KPI ROW */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10,marginBottom:20,animation:"slideUp 0.4s ease-out"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))",gap:10,marginBottom:20,animation:"slideUp 0.4s ease-out"}}>
             <Kpi label="Total TVL" value={$f(tvl)} sub="Simulated $1M start" />
-            <Kpi label="STRC Price" value={`$${(strc||latest.strc).toFixed(2)}`} sub={strc?"Live Nasdaq":"Last known"} color={strc?"#34d399":C.DK} pulse={!!strc} />
-            <Kpi label="Senior APY" value="8.00%" sub={pf(srTot)+" cumulative"} color={C.SR} />
-            <Kpi label="Junior Return" value={pf(jrTot)} sub={$f(latest.jr)+" NAV"} color={C.JR} />
-            <Kpi label="Leverage" value={latest.lev.toFixed(2)+"x"} sub={`${P.LEV_MIN}–${P.LEV_MAX}x range`} />
-            <Kpi label="Sr / Jr" value={`${ratio.toFixed(1)} / ${(100-ratio).toFixed(1)}`} sub="Target 70/30" color={C.SR} />
-            <Kpi label="Regime" value={latest.reg} sub={`Score ${latest.comp}`} color={RC[latest.reg]} />
-            <Kpi label="Jr Max DD" value={jrDD.toFixed(1)+"%"} sub="Peak→trough" color={C.STRESS} />
+            <Kpi label="Senior APY" value="8.00%" sub="Fixed, paid first" color={C.SR} />
+            <Kpi label="Junior APY" value={`${jrNetApy>0?"+":""}${(jrNetApy*100).toFixed(1)}%`} sub={`At ${lev.toFixed(2)}x leverage`} color={C.JR} pulse={liveEps.length>0} />
+            <Kpi label="Pool Yield" value={`${(poolApy*100).toFixed(1)}%`} sub="Gross leveraged APY" color={C.CALM} />
+            <Kpi label="Leverage" value={lev.toFixed(2)+"x"} sub={`${P.LEV_MIN}–${P.LEV_MAX}x range`} />
+            <Kpi label="Health Factor" value={hf.toFixed(2)} sub={hf>=2.0?"Normal":hf>=1.8?"Watch":hf>=1.6?"Deleveraging":"Critical"} color={hf>=1.8?C.CALM:hf>=1.6?"#fbbf24":C.STRESS} />
           </div>
 
           {/* MAIN CHART */}
