@@ -211,6 +211,7 @@ function DocsPage() {
         <p style={{margin:"0 0 8px"}}><strong>Signal 2 — BTC 7d realized vol (35%):</strong> Confirms if implied fear is materializing. Range: 20%–45%.</p>
         <p style={{margin:"0 0 8px"}}><strong>Signal 3 — STRC par deviation (25%):</strong> Collateral-specific mean reversion. Ceiling: 4.3%.</p>
         <p style={{margin:"14px 0 0",fontSize:13,color:C.DK}}>Composite: CALM {"<"}0.3 → MODERATE 0.3-0.5 → ELEVATED 0.5-0.7 → STRESS {">"}0.7. EWMA smoothing (α=0.40). Max ±0.25x/epoch.</p>
+        <p style={{margin:"10px 0 0",fontSize:13,color:C.DK}}>Paper portfolio note: DVOL is approximated from realized vol (DVOL ≈ 1.15× 30d realized). On-chain, the vault would use a live Deribit DVOL oracle feed via Chainlink for actual forward-looking implied volatility.</p>
       </S>
 
       <S t="The 70/30 Ratio">
@@ -218,11 +219,21 @@ function DocsPage() {
       </S>
 
       <S t="Risk Management">
-        Four-level deleveraging cascade: HF ≤ 1.30 → reduce to 1.50x. HF ≤ 1.10 → deleverage to 1.0x. HF ≤ 1.05 → exit 25%/epoch. HF ≤ 1.02 → emergency shutdown. HF checked every 30s. Withdrawal cap: 15% of tranche TVL per epoch. 5-10% USDC reserve for instant redemptions.
+        <p style={{margin:"0 0 10px"}}>Four-level deleveraging cascade: HF ≤ 1.30 → reduce to 1.50x. HF ≤ 1.10 → deleverage to 1.0x. HF ≤ 1.05 → exit 25%/epoch. HF ≤ 1.02 → emergency shutdown. HF checked every 30s. Withdrawal cap: 15% of tranche TVL per epoch. 5-10% USDC reserve for instant redemptions.</p>
+        <p style={{margin:"10px 0 0",fontSize:13,color:C.DK}}>Health factor on the dashboard is a closed-form approximation from leverage and liquidation threshold. On-chain, HF would be computed directly from Aave/Morpho account state (collateral value × liquidation threshold / borrowed amount).</p>
+      </S>
+
+      <S t="What This Dashboard Does and Doesn't Do">
+        <p style={{margin:"0 0 10px"}}>This is a paper portfolio demonstrating the vault's economic engine — the math that governs yield splitting, leverage adjustment, and waterfall distribution. It runs the same formulas that the production Solidity contracts implement.</p>
+        <p style={{margin:"0 0 8px"}}><strong>What's live:</strong> Real BTC price (CoinGecko), real STRC price (Yahoo Finance / Nasdaq), three-signal composite, dynamic leverage, full waterfall math, per-share return tracking.</p>
+        <p style={{margin:"0 0 8px"}}><strong>What's simulated:</strong> There are no actual lending positions on Aave/Morpho — health factor is derived from leverage, not from on-chain collateral/debt. No withdrawal queues, epoch caps, or USDC reserve management (those are described for the production vault). No real deposits or redemptions.</p>
+        <p style={{margin:"0 0 0",fontSize:13,color:C.DK}}>The vault is not deployed on-chain. Production deployment requires Saturn Protocol mainnet, audited Solidity contracts, and Aave/Morpho integration.</p>
       </S>
 
       <S t="Paper Portfolio">
-        32 verified backtest epochs (Jul 2025 – Mar 2026) using real STRC/BTC prices, plus live forward simulation from current market data. $1M simulated TVL. No real capital. The chart extends automatically as weeks pass.
+        <p style={{margin:"0 0 8px"}}>32 verified backtest epochs (Jul 2025 – Mar 2026) using real STRC/BTC prices, plus live forward simulation from current market data. $1M simulated TVL. No real capital deployed.</p>
+        <p style={{margin:"0 0 8px"}}>The backtest and forward simulation are displayed as one continuous timeline. A vertical marker on the chart indicates where backtest ends and live simulation begins. Forward epochs use real-time STRC and BTC prices, polled every 15 seconds.</p>
+        <p style={{margin:"0 0 0",fontSize:13,color:C.DK}}>Junior since-inception returns include both yield income and STRC mark-to-market effects. A substantial portion of backtest-period returns came from STRC's recovery from its IPO discount (~$93.74 → $100), which was a one-time event. Forward junior APY shown in the dashboard is calculated purely from current leverage and yield spreads — it reflects ongoing income, not price appreciation.</p>
       </S>
 
       <div style={{marginTop:44,padding:20,background:C.ACCENT,border:"1px solid rgba(91,156,245,0.12)",borderRadius:10}}>
@@ -320,6 +331,10 @@ export default function App() {
   // Health factor from leverage
   const hf = lev > 1 ? (lev * 0.825) / (lev - 1) : Infinity;
 
+  // Junior since-inception return (share-price based for forward, NAV for backtest)
+  const jrSinceInception = latest.jrSP ? (latest.jrSP - 100) : ((latest.jr - first.jr) / first.jr * 100);
+  const srSinceInception = latest.srSP ? (latest.srSP - 100) : ((latest.sr - first.sr) / first.sr * 100);
+
   // Chart data — use share prices for forward, NAV-based for backtest
   const cd = all.map(s => ({
     label: s.date.slice(2,10).replace(/-/g,"/"),
@@ -399,9 +414,9 @@ export default function App() {
         <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 20px 40px"}}>
           {/* KPI ROW */}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))",gap:10,marginBottom:20,animation:"slideUp 0.4s ease-out"}}>
-            <Kpi label="Total TVL" value={$f(tvl)} sub="Simulated $1M start" />
-            <Kpi label="Senior APY" value="8.00%" sub="Fixed, paid first" color={C.SR} />
-            <Kpi label="Junior APY" value={`${jrNetApy>0?"+":""}${(jrNetApy*100).toFixed(1)}%`} sub={`At ${lev.toFixed(2)}x leverage`} color={C.JR} pulse={liveEps.length>0} />
+            <Kpi label="Total TVL" value={$f(tvl)} sub={tvl>1000000?`Started $1M`:"Simulated $1M start"} />
+            <Kpi label="Senior APY" value="8.00%" sub={`+${srSinceInception.toFixed(1)}% since inception`} color={C.SR} />
+            <Kpi label="Junior APY" value={`${jrNetApy>0?"+":""}${(jrNetApy*100).toFixed(1)}%`} sub={`${jrSinceInception>=0?"+":""}${jrSinceInception.toFixed(1)}% since inception`} color={C.JR} pulse={liveEps.length>0} />
             <Kpi label="Pool Yield" value={`${(poolApy*100).toFixed(1)}%`} sub="Gross leveraged APY" color={C.CALM} />
             <Kpi label="Leverage" value={lev.toFixed(2)+"x"} sub={`${P.LEV_MIN}–${P.LEV_MAX}x range`} />
             <Kpi label="Health Factor" value={hf.toFixed(2)} sub={hf>=2.0?"Normal":hf>=1.8?"Watch":hf>=1.6?"Deleveraging":"Critical"} color={hf>=1.8?C.CALM:hf>=1.6?"#fbbf24":C.STRESS} />
@@ -421,6 +436,7 @@ export default function App() {
                 <YAxis tick={{fontSize:9,fill:C.DK}} domain={["dataMin-3","dataMax+5"]} tickFormatter={v=>`$${Number(v).toFixed(0)}`} yAxisId="p" />
                 <Tooltip content={<ChartTip/>} />
                 <ReferenceLine yAxisId="p" y={100} stroke="rgba(148,163,184,0.08)" strokeDasharray="4 4" />
+                {liveEps.length>0 && <ReferenceLine yAxisId="p" x={BT[BT.length-1].date.slice(2,10).replace(/-/g,"/")} stroke="rgba(251,191,36,0.25)" strokeDasharray="6 3" label={{value:"LIVE →",position:"top",fontSize:8,fill:"rgba(251,191,36,0.5)"}} />}
                 <Area yAxisId="p" type="monotone" dataKey="srP" name="Senior" stroke={C.SR} strokeWidth={2} fill="url(#gs)" dot={false} activeDot={{r:3,fill:C.SR}} />
                 <Area yAxisId="p" type="monotone" dataKey="jrP" name="Junior" stroke={C.JR} strokeWidth={2} fill="url(#gj)" dot={false} activeDot={{r:3,fill:C.JR}} />
               </AreaChart>
@@ -429,6 +445,9 @@ export default function App() {
               <span style={{color:C.SR}}>● Senior (8% fixed)</span>
               <span style={{color:C.JR}}>● Junior (variable)</span>
               {liveEps.length>0 && <span style={{color:"rgba(251,191,36,0.6)"}}>│ Live from epoch {BT.length+1}</span>}
+            </div>
+            <div style={{textAlign:"center",fontSize:9,color:C.DK,fontFamily:F,padding:"2px 0 0"}}>
+              Backtest: 32 weeks of real STRC/BTC data{liveEps.length>0?" • Forward: live prices, updated every 15s":""} • Vault not deployed on-chain
             </div>
           </div>
 
