@@ -379,8 +379,11 @@ export default function App() {
   // Share prices — $100 invested at inception, what's it worth now? (moves in real time)
   const srSharePrice = (latest.sr / first.sr) * 100;
   const jrSharePrice = (latest.jr / first.jr) * 100;
-  const jrChange = jrSharePrice - 100;
   const srChange = srSharePrice - 100;
+  const jrChange = jrSharePrice - 100;
+  // Pool share price — $100 invested across 70/30, what's the blended pool worth?
+  const poolSharePrice = (tvl / (first.sr + first.jr)) * 100;
+  const poolChange = poolSharePrice - 100;
 
   // Chart data — use share prices for forward, NAV-based for backtest
   const cd = all.map(s => ({
@@ -461,9 +464,9 @@ export default function App() {
         <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 20px 40px"}}>
           {/* KPI ROW */}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))",gap:10,marginBottom:20,animation:"slideUp 0.4s ease-out"}}>
-            <Kpi label="Total TVL" value={$f(tvl)} sub={tvl>1000000?`Started $1M`:"Simulated $1M start"} pulse={!!strc} />
+            <Kpi label="Pool Return" value={`$${poolSharePrice.toFixed(2)}`} sub={`${poolChange>=0?"+":""}${poolChange.toFixed(1)}% since inception`} pulse={!!strc} />
             <Kpi label="sdcSENIOR" value={`$${srSharePrice.toFixed(2)}`} sub={`8.00% APY • +${srChange.toFixed(1)}%`} color={C.SR} />
-            <Kpi label="sdcJUNIOR" value={`$${jrSharePrice.toFixed(2)}`} sub={`${jrChange>=0?"+":""}${jrChange.toFixed(1)}% • ${(jrNetApy*100).toFixed(0)}% APY`} color={C.JR} pulse={!!strc} />
+            <Kpi label="sdcJUNIOR" value={`$${jrSharePrice.toFixed(2)}`} sub={`${(jrNetApy*100).toFixed(0)}% APY • ${jrChange>=0?"+":""}${jrChange.toFixed(1)}%`} color={C.JR} pulse={!!strc} />
             <Kpi label="Pool Yield" value={`${(poolApy*100).toFixed(1)}%`} sub="Gross leveraged APY" color={C.CALM} />
             <Kpi label="Leverage" value={lev.toFixed(2)+"x"} sub={`${P.LEV_MIN}–${P.LEV_MAX}x range`} />
             <Kpi label="Health Factor" value={hf.toFixed(2)} sub={hf>=2.0?"Normal":hf>=1.8?"Watch":hf>=1.6?"Deleveraging":"Critical"} color={hf>=1.8?C.CALM:hf>=1.6?"#fbbf24":C.STRESS} />
