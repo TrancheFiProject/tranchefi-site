@@ -130,8 +130,8 @@ const BT = [
 const C = {
   SR:"#5b9cf5", JR:"#ef8b3a",
   CALM:"#34d399", MOD:"#fbbf24", ELEV:"#fb923c", STRESS:"#f87171",
-  T:"#E5ECFF", M:"#B0B8CC", D:"#8B93A7", DK:"#5E667A",
-  BG:"#050814", CARD:"rgba(11,16,32,0.85)", BD:"rgba(148,163,184,0.08)",
+  T:"#E5ECFF", M:"#CBD5E8", D:"#A0ABBD", DK:"#8B93A7",
+  BG:"#050814", CARD:"rgba(11,16,32,0.85)", BD:"rgba(148,163,184,0.10)",
   ACCENT:"rgba(91,156,245,0.08)",
   DOCBG:"#0B1020", DOCBD:"#1F2933",
 };
