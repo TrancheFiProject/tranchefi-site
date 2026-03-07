@@ -389,14 +389,13 @@ const jrNetApy = jrGrossApy > 0 ? jrGrossApy * (1 - P.JR_PERF) - P.JR_MGMT : jrG
 // Health factor from leverage
 const hf = lev > 1 ? (lev * 0.825) / (lev - 1) : Infinity;
 
-// Share prices — $100 invested at inception, what's it worth now? (moves in real time)
-const srSharePrice = (latest.sr / first.sr) * 100;
-const jrSharePrice = (latest.jr / first.jr) * 100;
+// Share prices — use tracked per-share returns (avoids 70/30 rebalancing artifacts)
+const srSharePrice = lastEpoch.srSP || (lastEpoch.sr / first.sr * 100);
+const jrSharePrice = lastEpoch.jrSP || (lastEpoch.jr / first.jr * 100);
 const srChange = srSharePrice - 100;
 const jrChange = jrSharePrice - 100;
-  // Pool share price — $100 invested across 70/30, what's the blended pool worth?
-  const poolSharePrice = (tvl / (first.sr + first.jr)) * 100;
-  const poolChange = poolSharePrice - 100;
+const poolSharePrice = srSharePrice * 0.70 + jrSharePrice * 0.30;
+const poolChange = poolSharePrice - 100;
 
 // Chart data — use share prices for forward, NAV-based for backtest
 const cd = all.map(s => ({
