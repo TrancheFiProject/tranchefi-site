@@ -188,7 +188,8 @@ const S = ({t,children,accent}) => (
 <div style={{fontSize:14.5,color:"#E5ECFF",lineHeight:1.7,fontFamily:FS}}>{children}</div>
 </div>
 );
-const K = ({children}) => <span style={{color:"#FBBF24",fontWeight:600}}>{children}</span>;
+const Sr = ({children}) => <span style={{color:C.SR,fontWeight:600}}>{children}</span>;
+const Jr = ({children}) => <span style={{color:C.JR,fontWeight:600}}>{children}</span>;
 const B = ({children}) => <span style={{color:"#CBD5FF",fontWeight:500}}>{children}</span>;
 const Note = ({children}) => <p style={{margin:"10px 0 0",fontSize:13,color:"#8B93A7",lineHeight:1.6}}>{children}</p>;
 
@@ -200,21 +201,21 @@ return (
 
 <S t="The Core Idea">
 <p style={{margin:"0 0 10px"}}>TrancheFi takes leveraged exposure to Saturn's <B>sUSDat</B> (a yield-bearing stablecoin backed by Strategy's STRC digital credit) and splits it into two tranches with fundamentally different risk/return profiles.</p>
-<p style={{margin:"0 0 8px"}}><K>Senior</K> gets a fixed <K>8% net yield</K>, paid first from the income stream. Zero drawdowns by design — junior absorbs all volatility before senior principal is touched.</p>
-<p style={{margin:"0 0 0"}}><K>Junior</K> absorbs all residual yield and all price volatility — in exchange for amplified returns in the <K>21-25% range</K> under normal market conditions.</p>
+<p style={{margin:"0 0 8px"}}><Sr>Senior</Sr> gets a fixed <Sr>8% net yield</Sr>, paid first from the income stream. Zero drawdowns by design — <Jr>junior</Jr> absorbs all volatility before <Sr>senior</Sr> principal is touched.</p>
+<p style={{margin:"0 0 0"}}><Jr>Junior</Jr> absorbs all residual yield and all price volatility — in exchange for amplified returns in the <Jr>21-25% range</Jr> under normal market conditions.</p>
 </S>
 
 <S t="Weekly Epochs">
 <p style={{margin:"0 0 12px"}}>The vault settles on a 7-day cycle. Every week, income flows through a strict waterfall:</p>
-<p style={{margin:"0 0 8px"}}><span style={{color:C.SR,fontWeight:600}}>1. Senior coupon</span> — 8.5% gross (~0.163%/wk). After 0.50% mgmt fee → 8.0% net (8.32% effective APY with weekly compounding).</p>
+<p style={{margin:"0 0 8px"}}><Sr>1. Senior coupon</Sr> — 8.5% gross (~0.163%/wk). After 0.50% mgmt fee → 8.0% net (8.32% effective APY with weekly compounding).</p>
 <p style={{margin:"0 0 8px"}}><B>2. Management fees</B> — 0.50% annual on each tranche's NAV, deducted weekly.</p>
-<p style={{margin:"0 0 8px"}}><B>3. Performance fee</B> — 10% on junior's realized yield income only. Not charged on mark-to-market. No hurdle rate.</p>
-<p style={{margin:"0 0 8px"}}><span style={{color:C.JR,fontWeight:600}}>4. Junior residual</span> — all remaining yield + ALL mark-to-market (positive or negative).</p>
-<Note>Senior's yield comes from dividend income, not price appreciation. STRC price drops affect junior NAV. Senior principal impaired only after junior is fully wiped.</Note>
+<p style={{margin:"0 0 8px"}}><B>3. Performance fee</B> — 10% on <Jr>junior's</Jr> realized yield income only. Not charged on mark-to-market. No hurdle rate.</p>
+<p style={{margin:"0 0 8px"}}><Jr>4. Junior residual</Jr> — all remaining yield + ALL mark-to-market (positive or negative).</p>
+<Note><Sr>Senior's</Sr> yield comes from dividend income, not price appreciation. STRC price drops affect <Jr>junior</Jr> NAV. <Sr>Senior</Sr> principal impaired only after <Jr>junior</Jr> is fully wiped.</Note>
 </S>
 
 <S t="Three-Signal Leverage System">
-<p style={{margin:"0 0 12px"}}>Dynamic leverage <K>1.25x–2.0x</K> via three-signal composite, updated every epoch:</p>
+<p style={{margin:"0 0 12px"}}>Dynamic leverage <B>1.25x–2.0x</B> via three-signal composite, updated every epoch:</p>
 <p style={{margin:"0 0 8px"}}><B>Signal 1 — BTC DVOL (40%):</B> Forward-looking 30d implied vol from Deribit. Leads realized by 12-48hr. Normalized range: 18%–39%.</p>
 <p style={{margin:"0 0 8px"}}><B>Signal 2 — BTC 7d realized vol (35%):</B> Confirms if implied fear is materializing. Normalized range: 20%–45%.</p>
 <p style={{margin:"0 0 8px"}}><B>Signal 3 — STRC par deviation (25%):</B> Collateral-specific mean reversion signal. Ceiling: 4.3% from $100 par.</p>
@@ -223,8 +224,8 @@ return (
 </S>
 
 <S t="The 70/30 Ratio">
-<p style={{margin:"0 0 8px"}}><K>70% senior / 30% junior.</K> Junior gets ~5.8x effective exposure to the spread above senior cost. Deposits are queued if they would push the ratio outside the 68-72% band.</p>
-<p style={{margin:0}}>Self-correcting: if senior becomes overweight, junior APY rises mechanically → attracts junior capital → ratio rebalances.</p>
+<p style={{margin:"0 0 8px"}}><B>70% <Sr>senior</Sr> / 30% <Jr>junior</Jr>.</B> <Jr>Junior</Jr> gets ~5.8x effective exposure to the spread above <Sr>senior</Sr> cost. Deposits are queued if they would push the ratio outside the 68-72% band.</p>
+<p style={{margin:0}}>Self-correcting: if <Sr>senior</Sr> becomes overweight, <Jr>junior</Jr> APY rises mechanically → attracts <Jr>junior</Jr> capital → ratio rebalances.</p>
 </S>
 
 <S t="Risk Management">
@@ -238,16 +239,16 @@ return (
 </S>
 
 <S t="What This Dashboard Does and Doesn't Do" accent={C.JR}>
-<p style={{margin:"0 0 10px"}}>This is a <K>paper portfolio</K> demonstrating the vault's economic engine — the math that governs yield splitting, leverage adjustment, and waterfall distribution. It runs the same formulas that the production Solidity contracts implement.</p>
+<p style={{margin:"0 0 10px"}}>This is a <B>paper portfolio</B> demonstrating the vault's economic engine — the math that governs yield splitting, leverage adjustment, and waterfall distribution. It runs the same formulas that the production Solidity contracts implement.</p>
 <p style={{margin:"0 0 8px"}}><B>What's live:</B> Real BTC price (CoinGecko), real STRC price (Yahoo Finance / Nasdaq), three-signal composite, dynamic leverage, full waterfall math, per-share return tracking. Updates every 15 seconds.</p>
 <p style={{margin:"0 0 8px"}}><B>What's simulated:</B> There are no actual lending positions on Aave/Morpho — health factor is derived from leverage, not from on-chain collateral/debt. No withdrawal queues, epoch caps, or USDC reserve management. No real deposits or redemptions.</p>
-<Note><K>No real capital deployed.</K> The vault is not deployed on-chain. Production deployment requires Saturn Protocol mainnet, audited Solidity contracts, and Aave/Morpho integration.</Note>
+<Note><B>No real capital deployed.</B> The vault is not deployed on-chain. Production deployment requires Saturn Protocol mainnet, audited Solidity contracts, and Aave/Morpho integration.</Note>
 </S>
 
 <S t="Paper Portfolio" accent={C.SR}>
-<p style={{margin:"0 0 8px"}}><K>32 verified backtest epochs</K> (Jul 2025 – Mar 2026) using real STRC/BTC prices, plus live forward simulation from current market data. $1M simulated TVL.</p>
+<p style={{margin:"0 0 8px"}}><B>32 verified backtest epochs</B> (Jul 2025 – Mar 2026) using real STRC/BTC prices, plus live forward simulation from current market data. $1M simulated TVL.</p>
 <p style={{margin:"0 0 8px"}}>The backtest and forward simulation are displayed as one continuous timeline. A vertical marker on the chart indicates where backtest ends and live simulation begins. Forward epochs use real-time STRC and BTC prices.</p>
-<Note>Junior since-inception returns include both yield income and STRC mark-to-market effects. A substantial portion of backtest-period returns came from STRC's recovery from its IPO discount (~$93.74 → $100), which was a one-time event. Forward junior APY shown in the KPI cards is calculated purely from current leverage and yield spreads — it reflects ongoing income, not price appreciation.</Note>
+<Note><Jr>Junior</Jr> since-inception returns include both yield income and STRC mark-to-market effects. A substantial portion of backtest-period returns came from STRC's recovery from its IPO discount (~$93.74 → $100), which was a one-time event. Forward <Jr>junior</Jr> APY shown in the KPI cards is calculated purely from current leverage and yield spreads — it reflects ongoing income, not price appreciation.</Note>
 </S>
 
 <div style={{marginTop:44,padding:20,background:"rgba(91,156,245,0.06)",border:"1px solid rgba(91,156,245,0.12)",borderRadius:10}}>
@@ -316,18 +317,26 @@ return () => clearInterval(iv);
 useEffect(() => {
 if (!btc) return;
 const last = BT[BT.length - 1];
-const wks = Math.floor((Date.now() - new Date(last.date).getTime()) / (7*864e5));
-if (wks <= 0) { setLiveEps([]); return; }
+const msSince = Date.now() - new Date(last.date).getTime();
+const wks = Math.floor(msSince / (7*864e5));
 const eps = [];
 let prev = {...last, srSP: last.sr/BT[0].sr*100, jrSP: last.jr/BT[0].jr*100};
 for (let i = 0; i < wks; i++) {
-const progress = (i + 1) / wks;
+const progress = (i + 1) / Math.max(wks, 1);
 const b = last.btc + (btc - last.btc) * progress;
 // Use real STRC for the latest epoch, interpolate for intermediate
 const s = strc ? (i === wks - 1 ? strc : last.strc + (strc - last.strc) * progress) : null;
 const ep = simEpoch(prev, b, s);
 eps.push(ep);
 prev = ep;
+}
+// Add partial epoch for current in-progress week so monthly table shows live data
+const daysFrac = (msSince % (7*864e5)) / (7*864e5);
+if (daysFrac > 0.01) {
+const nowEp = simEpoch(prev, btc, strc || null);
+const srDelta = nowEp.sr - prev.sr;
+const jrDelta = nowEp.jr - prev.jr;
+eps.push({...nowEp, sr: prev.sr + srDelta * daysFrac, jr: prev.jr + jrDelta * daysFrac, date: new Date().toISOString().split("T")[0], live: true});
 }
 setLiveEps(eps);
 }, [btc, strc]);
@@ -379,9 +388,8 @@ const hf = lev > 1 ? (lev * 0.825) / (lev - 1) : Infinity;
 // Share prices — $100 invested at inception, what's it worth now? (moves in real time)
 const srSharePrice = (latest.sr / first.sr) * 100;
 const jrSharePrice = (latest.jr / first.jr) * 100;
-  const jrChange = jrSharePrice - 100;
 const srChange = srSharePrice - 100;
-  const jrChange = jrSharePrice - 100;
+const jrChange = jrSharePrice - 100;
   // Pool share price — $100 invested across 70/30, what's the blended pool worth?
   const poolSharePrice = (tvl / (first.sr + first.jr)) * 100;
   const poolChange = poolSharePrice - 100;
@@ -468,7 +476,6 @@ transition:"all 0.2s",
             <Kpi label="Total TVL" value={$f(tvl)} sub={tvl>1000000?`Started $1M`:"Simulated $1M start"} pulse={!!strc} />
             <Kpi label="Pool Return" value={`$${poolSharePrice.toFixed(2)}`} sub={`${poolChange>=0?"+":""}${poolChange.toFixed(1)}% since inception`} pulse={!!strc} />
 <Kpi label="sdcSENIOR" value={`$${srSharePrice.toFixed(2)}`} sub={`8.00% APY • +${srChange.toFixed(1)}%`} color={C.SR} />
-            <Kpi label="sdcJUNIOR" value={`$${jrSharePrice.toFixed(2)}`} sub={`${jrChange>=0?"+":""}${jrChange.toFixed(1)}% • ${(jrNetApy*100).toFixed(0)}% APY`} color={C.JR} pulse={!!strc} />
             <Kpi label="sdcJUNIOR" value={`$${jrSharePrice.toFixed(2)}`} sub={`${(jrNetApy*100).toFixed(0)}% APY • ${jrChange>=0?"+":""}${jrChange.toFixed(1)}%`} color={C.JR} pulse={!!strc} />
 <Kpi label="Pool Yield" value={`${(poolApy*100).toFixed(1)}%`} sub="Gross leveraged APY" color={C.CALM} />
 <Kpi label="Leverage" value={lev.toFixed(2)+"x"} sub={`${P.LEV_MIN}–${P.LEV_MAX}x range`} />
