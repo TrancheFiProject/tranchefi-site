@@ -189,7 +189,7 @@ function VolFlow({btcPrice, strcPrice, mstrPrice, srVol, jrVol, strcVol}) {
           <Layer label="STRC" price={strcPrice?"$"+strcPrice.toFixed(2):"--"} vol={strcVol} color={C.SR} sub="Strips volatility"/>
         </div>
         <Connector label="saturn protocol"/>
-        <Layer label="sUSDat" price="10.35% yield" vol={strcVol} color={C.SAFE} sub="Programmable credit"/>
+        <Layer label="sUSDat" price="~10.35% est. yield" vol={strcVol} color={C.SAFE} sub="Programmable credit"/>
         <Connector label="tranchefi · 1.75x"/>
         <Split/>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
@@ -391,12 +391,12 @@ export default function App() {
               <div style={{marginTop:14,paddingTop:12,borderTop:"1px solid "+C.BD}}>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 16px",fontSize:10.5,fontFamily:F}}>
                   {[
-                    ["Jr Sharpe", sharpe.toFixed(2), C.T],
-                    ["Jr Sortino", sortino.toFixed(2), C.T],
-                    ["Jr Volatility", jrVol.toFixed(1)+"%", C.WARN],
-                    ["Sr Volatility", srVol.toFixed(1)+"%", C.SAFE],
-                    ["Jr Max DD", jrMaxDD.toFixed(1)+"%", C.DANGER],
-                    ["DD Recovery", (jrRecovery||"3-6")+" wks", C.T],
+                    ["Jr Sharpe", sharpe.toFixed(2), C.JR],
+                    ["Jr Sortino", sortino.toFixed(2), C.JR],
+                    ["Jr Volatility", jrVol.toFixed(1)+"%", C.JR],
+                    ["Sr Volatility", srVol.toFixed(1)+"%", C.SR],
+                    ["Jr Max DD", jrMaxDD.toFixed(1)+"%", C.JR],
+                    ["DD Recovery", (jrRecovery||"3-6")+" wks", C.JR],
                   ].map(([k,v,c],i) => (
                     <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"3px 0"}}>
                       <span style={{color:"#8B93A7"}}>{k}</span>
