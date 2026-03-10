@@ -319,7 +319,7 @@ export default function App() {
 
   const cd = all.map(s => ({label:s.date.slice(2,10).replace(/-/g,"/"), srP:+(s.srSP||100).toFixed(2), jrP:+(s.jrSP||100).toFixed(2), hf:s.hf||2.01}));
   const mm = {}; all.forEach(s => {const m=s.date.slice(0,7); if(!mm[m])mm[m]={o:s}; mm[m].c=s;});
-  const monthly = Object.entries(mm).map(([m,{o,c}]) => ({month:m, srR:((c.srSP||100)-(o.srSP||100))/(o.srSP||100)*100, jrR:((c.jrSP||100)-(o.jrSP||100))/(o.jrSP||100)*100, hf:c.hf||2.01}));
+  const monthly = Object.entries(mm).map(([m,{o,c}]) => ({month:m, srR:((c.srSP||100)-(o.srSP||100))/(o.srSP||100)*100, jrR:((c.jrSP||100)-(o.jrSP||100))/(o.jrSP||100)*100, hf:c.hf||2.01})).filter(m => !(m.srR === 0 && m.jrR === 0));
   const intv = Math.max(1,Math.floor(cd.length/10));
 
   return (
