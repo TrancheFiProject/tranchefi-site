@@ -33,6 +33,15 @@ export default async function handler(req, res) {
       strcPrice = d?.quoteResponse?.result?.[0]?.regularMarketPrice || null;
     } catch (e) {}
   }
-
-  return res.json({ btcPrice, strcPrice, timestamp: Date.now() });
+// MSTR from Yahoo Finance
+  let mstrPrice = null;
+  try {
+    const r = await fetch(
+      'https://query1.finance.yahoo.com/v8/finance/chart/MSTR?range=1d&interval=1m',
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+    );
+    const d = await r.json();
+    mstrPrice = d?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+  } catch (e) {}
+  return res.json({ btcPrice, strcPrice, mstrPrice, timestamp: Date.now() });
 }
