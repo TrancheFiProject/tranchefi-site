@@ -1,17 +1,16 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=5');
-
   let btcPrice = null;
   let strcPrice = null;
-
+  let strcPrevClose = null;
+  let mstrPrice = null;
   // BTC from CoinGecko
   try {
     const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
     const d = await r.json();
     btcPrice = d?.bitcoin?.usd || null;
   } catch (e) {}
-
   // STRC from Yahoo Finance
   try {
     const r = await fetch(
@@ -21,7 +20,6 @@ export default async function handler(req, res) {
     const d = await r.json();
     strcPrice = d?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
   } catch (e) {}
-
   // Fallback: try v6 endpoint
   if (!strcPrice) {
     try {
@@ -33,8 +31,19 @@ export default async function handler(req, res) {
       strcPrice = d?.quoteResponse?.result?.[0]?.regularMarketPrice || null;
     } catch (e) {}
   }
-// MSTR from Yahoo Finance
-  let mstrPrice = null;
+  // STRC previous day close for true 1D return
+  try {
+    const r = await fetch(
+      'https://query1.finance.yahoo.com/v8/finance/chart/STRC?range=5d&interval=1d',
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+    );
+    const d = await r.json();
+    const closes = d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+    if (closes && closes.length >= 2) {
+      strcPrevClose = closes[closes.length - 2] || null;
+    }
+  } catch (e) {}
+  // MSTR from Yahoo Finance
   try {
     const r = await fetch(
       'https://query1.finance.yahoo.com/v8/finance/chart/MSTR?range=1d&interval=1m',
@@ -43,5 +52,5 @@ export default async function handler(req, res) {
     const d = await r.json();
     mstrPrice = d?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
   } catch (e) {}
-  return res.json({ btcPrice, strcPrice, mstrPrice, timestamp: Date.now() });
+  return res.json({ btcPrice, strcPrice, strcPrevClose, mstrPrice, timestamp: Date.now() });
 }
